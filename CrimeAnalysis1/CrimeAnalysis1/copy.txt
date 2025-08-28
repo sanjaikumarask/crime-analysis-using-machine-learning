@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Crime Analysis || Prediction {% endblock title %}
+{% block link %}{% static 'css/home.css' %} {% endblock link %}
+
+{% block content %}
+<header>
+    <h1>Crime Analysis and Prediction</h1>
+    <p>Use the form below to predict crime based on past data.</p>
+    <div class="report">
+        <a href="{% url 'report' %}"><button type="button"> Report Crime </button></a>
+    </div>
+    <div class="logout-container">
+        <a href="{% url 'logout' %}"><button type="button"> Logout </button></a>
+    </div>
+</header>
+
+<main>
+    {% include 'messages.html' %}
+    {% comment %} <form id="crime-form" method="POST">  <!-- Add method="POST" -->
+        {% csrf_token %}
+        <label for="location">Location:</label>
+        {{ form.location }}
+
+        <label for="crime-type">Crime Type:</label>
+        {{ form.crime_type }}
+
+        <label for="date-range">Date Range:</label>
+        {{ form.start_date }}
+        {{ form.end_date }}
+
+        <button type="submit">Predict Crime</button>
+    </form> {% endcomment %}
+
+    <form method="GET">
+        {{ form.as_p }}
+        <button type="submit">Search</button>
+    </form>
+
+    <ul>
+        {% for report in crime_reports %}
+            <li> {{ report.crime }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Crime Data Visualization</h2>
+
+
+    <h3>Crime by Type</h3>
+<canvas id="crimeByTypeChart"></canvas>
+
+<script>
+   
+
+
+var crimeReports = {{ crime_reports|safe }} || []; 
+
+// Initialize the crimeTypes object
+var crimeTypes = {};
+
+// Ensure crimeReports contains valid data
+if (crimeReports.length > 0) {
+    // Iterate through crime reports and count occurrences of each crime type
+    crimeReports.forEach(function(report) {
+        if (crimeTypes[report.crime]) {
+            crimeTypes[report.crime]++;
+        } else {
+            crimeTypes[report.crime] = 1;
+        }
+    });
+}
+
+// Prepare data for the donut chart
+var ctxType = document.getElementById('crimeByTypeChart').getContext('2d');
+var crimeTypeChart = new Chart(ctxType, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(crimeTypes),  // Crime types as labels
+        datasets: [{
+            label: 'Crime Types',
+            data: Object.values(crimeTypes),  // Crime counts as data
+            backgroundColor: [
+                'red', 'blue', 'green', 'yellow', 'purple', 'orange'
+            ],  // Color palette for the chart
+            hoverOffset: 4  // Offset when hovering over a section
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                enabled: true
+            }
+        }
+    }
+});
+
+</script>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Crime Analysis and Prediction. All rights reserved.</p>
+</footer>
+{% endblock content %}

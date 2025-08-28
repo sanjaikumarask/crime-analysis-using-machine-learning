@@ -1,0 +1,7 @@
+django
+django-jazzmin
+pandas 
+matplotlib 
+seaborn
+pandas 
+openpyxl

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Crime Results {% endblock title %}
+{% block content %}
+    <header>
+        <h1>Crime Results</h1>
+    </header>
+
+    <main>
+        <h2>Filtered Crime Reports</h2>
+        <table>
+            <tr>
+                <th>Crime Type</th>
+                <th>Location</th>
+                <th>Date</th>
+            </tr>
+            {% for report in crime_reports %}
+            <tr>
+                <td>{{ report.crime_type }}</td>
+                <td>{{ report.place }}</td>
+                <td>{{ report.date }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>Donut Chart of Crime Types</h2>
+        <img src="data:image/png;base64,{{ chart }}" alt="Donut Chart" />
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Crime Analysis and Prediction. All rights reserved.</p>
+    </footer>
+{% endblock content %}

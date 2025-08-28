@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Crime Analysis || Prediction {% endblock title %}
+{% block link %}{% static 'css/home.css' %} {% endblock link %}
+
+{% block content %}
+<header>
+    <h1>Crime Analysis and Prediction</h1>
+    <p>Use the form below to predict crime based on past data.</p>
+    <div class="report">
+        <a href="{% url 'report' %}"><button type="button"> Report Crime </button></a>
+    </div>
+    <div class="logout-container">
+        <a href="{% url 'logout' %}"><button type="button"> Logout </button></a>
+    </div>
+</header>
+
+<main>
+    {% include 'messages.html' %}
+    {% comment %} <form id="crime-form" method="POST">  <!-- Add method="POST" -->
+        {% csrf_token %}
+        <label for="location">Location:</label>
+        {{ form.location }}
+
+        <label for="crime-type">Crime Type:</label>
+        {{ form.crime_type }}
+
+        <label for="date-range">Date Range:</label>
+        {{ form.start_date }}
+        {{ form.end_date }}
+
+        <button type="submit">Predict Crime</button>
+    </form> {% endcomment %}
+
+    <form method="GET">
+        {{ form.as_p }}
+        <button type="submit">Predict</button>
+    </form>
+    
+
+    <h2>Crime Reports</h2>
+    <ul>
+        {% for report in crime_reports %}
+            <li> {{ report.crime }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Crime Data Visualization</h2>
+    <h3>Crime by Type</h3>
+    <canvas id="crimeByTypeChart"></canvas>
+
+    <h3>Crime by Month</h3>
+    <canvas id="crimeByMonthChart"></canvas>
+
+    <h3>Crime by Type</h3>
+<canvas id="crimeByTypeChart"></canvas>
+
+<script>
+     // Data for Crime by Type
+     var crimeReports = {{ crime_reports|safe }} || []; 
+
+     // Initialize the crimeTypes object
+     var crimeTypes = {};
+ 
+     // Ensure crimeReports contains valid data
+     if (crimeReports.length > 0) {
+         // Iterate through crime reports and count occurrences of each crime type
+         crimeReports.forEach(function(report) {
+             if (crimeTypes[report.crime]) {
+                 crimeTypes[report.crime]++;
+             } else {
+                 crimeTypes[report.crime] = 1;
+             }
+         });
+     }
+ 
+     // Prepare data for the donut chart
+     var ctxType = document.getElementById('crimeByTypeChart').getContext('2d');
+     var crimeTypeChart = new Chart(ctxType, {
+         type: 'doughnut',
+         data: {
+             labels: Object.keys(crimeTypes),
+             datasets: [{
+                 label: 'Crime Types',
+                 data: Object.values(crimeTypes),
+                 backgroundColor: ['red', 'blue', 'green', 'yellow', 'purple', 'orange'],
+                 hoverOffset: 4
+             }]
+         },
+         options: {
+             responsive: true,
+             plugins: {
+                 legend: { position: 'top' },
+                 tooltip: { enabled: true }
+             }
+         }
+     });
+ 
+     // Data for Crime by Month
+     var crimeByMonth = {{ crime_by_month|safe }} || [];
+     var months = [];
+     var monthCounts = [];
+ 
+     // Prepare data for the chart
+     crimeByMonth.forEach(function(item) {
+         months.push(item.month);  // Get month
+         monthCounts.push(item.total);  // Get total crimes for that month
+     });
+ 
+     // Create a bar chart for crimes by month
+     var ctxMonth = document.getElementById('crimeByMonthChart').getContext('2d');
+     var crimeMonthChart = new Chart(ctxMonth, {
+         type: 'bar',
+         data: {
+             labels: months.map(m => m + ' Month'),  // Convert month number to month name
+             datasets: [{
+                 label: 'Crime Count',
+                 data: monthCounts,
+                 backgroundColor: 'blue'
+             }]
+         },
+         options: {
+             responsive: true,
+             plugins: {
+                 legend: { position: 'top' },
+                 tooltip: { enabled: true }
+             },
+             scales: {
+                 y: {
+                     beginAtZero: true
+                 }
+             }
+         }
+     });
+ </script>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Crime Analysis and Prediction. All rights reserved.</p>
+</footer>
+{% endblock content %}

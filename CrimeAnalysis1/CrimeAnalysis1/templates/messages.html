@@ -1,0 +1,31 @@
+<!-- templates/messages.html -->
+
+{% if messages %}
+    <div id="message-container" style="max-width: 500px; margin: 0 auto; position:absolute">
+        {% for message in messages %}
+            <div class="alert-message" style="padding: 10px; margin-bottom: 10px;
+                        {% if message.tags == 'success' %}
+                            background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+                        {% elif message.tags == 'error' %}
+                            background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+                        {% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // Automatically hide messages after 4 seconds
+        setTimeout(function() {
+            var messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageContainer.style.transition = 'opacity 0.5s ease-out';
+                messageContainer.style.opacity = '0';  // Fade out
+                setTimeout(function() {
+                    messageContainer.style.display = 'none';  // Hide after fading
+                }, 500);  // Wait for fade-out to complete
+            }
+        }, 2000);  // 4 seconds
+    </script>
+{% endif %}
+
